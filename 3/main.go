@@ -20,23 +20,43 @@ func main() {
 	scanner := bufio.NewScanner(input)
 	scanner.Split(bufio.ScanRunes)
 
-	directedGraph := util.NewDirectedGraph("")
+	directedGraphAll := util.NewDirectedGraph("")
+	directedGraphSanta := util.NewDirectedGraph("")
+	directedGraphRoboSanta := util.NewDirectedGraph("")
+
+	whichSanta := 0
+	santas := []*util.DirectedGraph{directedGraphSanta, directedGraphRoboSanta}
 
 	for scanner.Scan() {
 		direction := scanner.Text()
 
 		switch (direction) {
 		case "^":
-			directedGraph.Move(util.North)
+			directedGraphAll.Move(util.North)
+			santas[whichSanta].Move(util.North)
 		case "v":
-			directedGraph.Move(util.South)
+			directedGraphAll.Move(util.South)
+			santas[whichSanta].Move(util.South)
 		case "<":
-			directedGraph.Move(util.West)
+			directedGraphAll.Move(util.West)
+			santas[whichSanta].Move(util.West)
 		case ">":
-			directedGraph.Move(util.East)
+			directedGraphAll.Move(util.East)
+			santas[whichSanta].Move(util.East)
 		}
+
+		whichSanta = 1 - whichSanta
 	}
 
-	fmt.Printf("Part 1: %d\n", len(directedGraph.Visits))
-	//	fmt.Printf("Part 2: %d\n", atBasement)
+	// Combine santas
+	combinedVisits := map[string]int{}
+	for coor, visits := range santas[0].Visits {
+		combinedVisits[coor] += visits
+	}
+	for coor, visits := range santas[1].Visits {
+		combinedVisits[coor] += visits
+	}
+
+	fmt.Printf("Part 1: %d\n", len(directedGraphAll.Visits))
+	fmt.Printf("Part 2: %d\n", len(combinedVisits))
 }
